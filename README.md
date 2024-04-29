@@ -39,7 +39,7 @@ Empty Fields: Many fields contained empty strings or NaN values which were not s
 Inconsistent Entries: Some text fields contained whitespace characters and non-standard symbols like '\u200b' and '\ufeff', which required normalization.
 
 To prepare the data set for import into the MongoDB database, the following Python script was employed to clean and scrub the data:
-'''
+```
 import csv
 
 def clean_row(header, row, irrelevant_columns):
@@ -72,44 +72,49 @@ try:
         csv_reader = csv.reader(f)
         csv_writer = csv.writer(f_new)
 
-        # Write the header without irrelevant columns
         header = next(csv_reader)
         cleaned_header = [column for column in header if column not in irrelevant_columns]
         csv_writer.writerow(cleaned_header)
 
-        # Write the remaining rows without irrelevant columns
         for row in csv_reader:
             cleaned_row = clean_row(header, row, irrelevant_columns)
             csv_writer.writerow(cleaned_row)
 except Exception as e:
     print(f"Error occurred: {e}")
-'''
+```
 
 This script processes the original CSV file, removing unwanted columns and normalizing text entries, then saves the cleaned data to a new CSV file ready for database import. It was necessary to remove several columns that were either irrelevant to the analysis goals or contained mostly unusable data.
 
 ## Inital Terminal Code:
-'''
+```
 mongoimport --headerline --type=csv --db=ss14744 --collection=listings --host=class-mongodb.cims.nyu.edu --file="/Users/sufiyahathena/Desktop/6-mongodb-analysis-sufiyahathena/data/listings_clean.csv" --username=ss14744 --password=TivqynMH
 mongo --host class-mongodb.cims.nyu.edu --username ss14744 --password TivqynMH --authenticationDatabase ss14744
 use ss14744
-'''
+```
 
 ## Data Analysis in MongoDB
 ### Query 1: Show exactly two documents from the listings collection in any order
-MongoDB Command: db.listings.find().limit(2)
+MongoDB Command: 
+```
+db.listings.find().limit(2)
+```
 Description: The first query aims to provide a brief glimpse into the listings database by retrieving two documents.
 Sample Results:
-'''
+```
 { "_id" : ObjectId("662fc40982d3bbe5a242e7f7"), "id" : 14726865, "listing_url" : "https://www.airbnb.com/rooms/14726865", "name" : "Rental unit in Munich · 1 bedroom · 1 bed · 1 shared bath", "description" : "", "host_id" : 91678611, "host_name" : "Ivana", "host_since" : "2016-08-24", "host_location" : "Munich, Germany", "host_response_time" : "", "host_response_rate" : "", "host_acceptance_rate" : "", "host_is_superhost" : "f", "host_neighbourhood" : "Neuhausen", "host_listings_count" : 1, "host_total_listings_count" : 1, "host_identity_verified" : "t", "neighbourhood" : "", "neighbourhood_cleansed" : "Neuhausen-Nymphenburg", "latitude" : 48.14569, "longitude" : 11.53166, "property_type" : "Shared room in rental unit", "room_type" : "Shared room", "accommodates" : 2, "bathrooms_text" : "1 shared bath", "beds" : 1, "price" : "", "minimum_nights" : 1, "maximum_nights" : 1125, "number_of_reviews" : 0, "first_review" : "", "last_review" : "", "review_scores_rating" : "", "review_scores_accuracy" : "", "review_scores_cleanliness" : "", "review_scores_checkin" : "", "review_scores_communication" : "", "review_scores_location" : "", "review_scores_value" : "", "instant_bookable" : "f", "calculated_host_listings_count" : 1, "calculated_host_listings_count_entire_homes" : 0, "calculated_host_listings_count_private_rooms" : 0, "calculated_host_listings_count_shared_rooms" : 1, "reviews_per_month" : "" }
 { "_id" : ObjectId("662fc40982d3bbe5a242e7f8"), "id" : 42892910, "listing_url" : "https://www.airbnb.com/rooms/42892910", "name" : "Rental unit in Munich · 1 bedroom · 1 bed · 1 bath", "description" : "", "host_id" : 318736185, "host_name" : "Emre", "host_since" : "2019-12-18", "host_location" : "İstanbul, Turkey", "host_response_time" : "", "host_response_rate" : "", "host_acceptance_rate" : "0%", "host_is_superhost" : "f", "host_neighbourhood" : "", "host_listings_count" : 1, "host_total_listings_count" : 1, "host_identity_verified" : "f", "neighbourhood" : "", "neighbourhood_cleansed" : "Milbertshofen-Am Hart", "latitude" : 48.20318, "longitude" : 11.56423, "property_type" : "Entire rental unit", "room_type" : "Entire home/apt", "accommodates" : 1, "bathrooms_text" : "1 bath", "beds" : 1, "price" : "$170.00", "minimum_nights" : 1, "maximum_nights" : 1125, "number_of_reviews" : 1, "first_review" : "2020-03-22", "last_review" : "2020-03-22", "review_scores_rating" : 4, "review_scores_accuracy" : 5, "review_scores_cleanliness" : 5, "review_scores_checkin" : 5, "review_scores_communication" : 5, "review_scores_location" : 5, "review_scores_value" : 4, "instant_bookable" : "f", "calculated_host_listings_count" : 1, "calculated_host_listings_count_entire_homes" : 1, "calculated_host_listings_count_private_rooms" : 0, "calculated_host_listings_count_shared_rooms" : 0, "reviews_per_month" : 0.02 }
-'''
+```
+
  The two listings shown highlight the diversity in the types of properties available. One is a fully private rental unit with three beds, while the other is a shared room, indicative of the variety in accommodation types in Munich. The listings are located in different neighborhoods ("Laim" and "Neuhausen-Nymphenburg"), suggesting geographic diversity. This could influence many factors such as price, demand, and host instructions. The presence of NaN or empty fields for price and review_scores_rating indicates missing information, which could be due to new listings or blanks in data collection. 
 
  ### Query 2: Viewing Ten Listings in a Readable Format
-MongoDB Command: db.listings.find().limit(10).pretty()
+MongoDB Command: 
+```
+db.listings.find().limit(10).pretty()
+```
 Description: This query fetches ten documents from the listings collection, using the pretty() function to format the output.
 Sample Results:
-'''
+```
 {
         "_id" : ObjectId("662fc40982d3bbe5a242e7fd"),
         "id" : 50368493,
@@ -251,11 +256,14 @@ Sample Results:
         "calculated_host_listings_count_shared_rooms" : 0,
         "reviews_per_month" : 0.12
 }
-'''
+```
+
 Each listing varies significantly in terms of amenities, price, and the number of nights required for booking, indicating a broad range of options tailored to different traveler needs and preferences. some listings have very few or no reviews, which could suggest newer listings or less frequent usage. This could be an opportunity for new hosts to capture market share or an indication of less popular properties.
 
 ### Query 3: Retrieving listings from two specific superhosts
-MongoDB Commands: db.listings.find({host_is_superhost: "t"}, {host_id: 1, host_name: 1, _id: 0}).limit(5)
+MongoDB Commands: 
+```
+db.listings.find({host_is_superhost: "t"}, {host_id: 1, host_name: 1, _id: 0}).limit(5)
 db.listings.find(
     {
         $or: [
@@ -273,20 +281,27 @@ db.listings.find(
         _id: 0
     }
 )
+```
 Description: This query retrieves listings from two superhosts, Jordy and Thomas, by filtering based on their respective host_ids. The results include only the name, price, neighbourhood, host_name, and host_is_superhost fields to focus on the most relevant information.
 Sample Results:
+```
 { "name" : "Rental unit in Munich · ★5.0 · 1 bedroom · 1 bed · 1 private bath", "host_name" : "Jordy", "host_is_superhost" : "t", "neighbourhood" : "", "price" : "" }
 { "name" : "Condo in Munich · ★5.0 · 1 bedroom · 1 bed · 1 shared bath", "host_name" : "Thomas", "host_is_superhost" : "t", "neighbourhood" : "", "price" : "$120.00" }
 { "name" : "Rental unit in Munich · ★5.0 · 1 bedroom · 2 beds · 1 bath", "host_name" : "Jordy", "host_is_superhost" : "t", "neighbourhood" : "", "price" : "$100.00" }
 { "name" : "Condo in Munich · ★4.83 · 1 bedroom · 1 bed · 1 shared bath", "host_name" : "Thomas", "host_is_superhost" : "t", "neighbourhood" : "", "price" : "" }
+```
 
 The listings showcase a variety of options in terms of space and accommodation types for both Jordy and Thomas who have two listed Airbnb's each.  For each super host they have one listing with visible prices which could indicate new listings or  incomplete data entries.
 
 ### Query 4:  Find all the unique host_name values
-MongoDB Commands: db.listings.distinct("host_name")
+MongoDB Commands: 
+```
+db.listings.distinct("host_name")
+```
 Description: This command retrieves a list of all unique host names from the listings collection.
 Sample Results:
 Random snippet of unique host names
+```
  "Pepe",
  "Pepijn",
 "Pere",
@@ -296,11 +311,13 @@ Random snippet of unique host names
 "Petra Andrea",
 "Phil",
 "Philip",
+```
 
 This result helps in analyzing the distribution of listings among different hosts, identifying top hosts, or simply understanding the scale of individual operations within the dataset.
 
 ### Query 5: Listings with More Than 2 Beds in a Selected Neighborhood, Ordered by Review Scores
 MongoDB Command: 
+```
 db.listings.find(
     {
         $and: [
@@ -317,19 +334,23 @@ db.listings.find(
         _id: 0
     }
 ).sort({review_scores_rating: -1})
+```
 Description: This query searches for listings within the "Schwabing-West" neighborhood that have more than two beds. It also filters out any listings that do not have a review score rating to avoid null values in the output. The results are sorted by review_scores_rating in descending order, ensuring that the highest-rated listings appear first. The query specifically returns the listing's name, number of beds, review scores rating, and price.
 Sample Results:
+```
 { "name" : "Condo in Munich · ★5.0 · 3 bedrooms · 3 beds · 2 baths", "beds" : 3, "price" : "$485.00", "review_scores_rating" : 5 }
 { "name" : "Rental unit in Munich · 3 bedrooms · 6 beds · 1.5 baths", "beds" : 6, "price" : "$850.00", "review_scores_rating" : 5 }
 { "name" : "Rental unit in Munich · ★5.0 · 3 bedrooms · 3 beds · 1.5 baths", "beds" : 3, "price" : "$383.00", "review_scores_rating" : 5 }
 { "name" : "Condo in Munich · ★5.0 · 2 bedrooms · 3 beds · 1.5 baths", "beds" : 3, "price" : "$210.00", "review_scores_rating" : 5 }
 { "name" : "Condo in Munich · 3 bedrooms · 4 beds · 2 baths", "beds" : 4, "price" : "$198.00", "review_scores_rating" : 5 }
 { "name" : "Rental unit in Munich · ★5.0 · 1 bedroom · 3 beds · 1 bath", "beds" : 3, "price" : "$150.00", "review_scores_rating" : 5 }
+```
 
 The data retrieved from the query highlights the availability and characteristics of larger accommodation options in the Schwabing-West neighborhood of Munich, which are capable of hosting larger groups due to the number of beds available (more than two). The pricing for these listings varies significantly, ranging from as low as $42.00 to as high as $850.00 per night. The types of properties range from condos to rental units, offering various living experiences. There appears to be a correlation between the number of beds, review scores, and pricing. Listings with higher review scores and more beds tend to command higher prices, reflecting the premium that guests are willing to pay for quality assured by other travelers’ experiences.
 
 ### Query 6: Number of listings per host
 MongoDB Command:
+```
 db.listings.aggregate([
     {
         $group: {
@@ -348,8 +369,10 @@ db.listings.aggregate([
         $sort: { totalListings: -1 }  
     }
 ])
+```
 Description: This query aggregates the listings by the host_id, counting the number of listings each host has under their profile. The results are then projected to exclude MongoDB's default _id field and rename the group identifier _id to host_id. Then sorted the results to see the hosts with the most listings at the top.
 Sample Results:
+```
 { "totalListings" : 152, "host_id" : 376961462 }
 { "totalListings" : 66, "host_id" : 205832270 }
 { "totalListings" : 52, "host_id" : 395880389 }
@@ -362,11 +385,13 @@ Sample Results:
 { "totalListings" : 28, "host_id" : 175608026 }
 { "totalListings" : 28, "host_id" : 308052561 }
 { "totalListings" : 26, "host_id" : 7901771 }
+```
 
  A few hosts manage a large number of listings, which might indicate professional or semi-professional property management involvement. Hosts with high numbers of listings could potentially offer diverse types of accommodations, impacting their responsiveness and the quality of service due to the scale of operations.
 
  ### Query 7: Average Review Scores Rating Per Neighborhood
  MongoDB Command:
+ ```
  db.listings.aggregate([
     {
         $match: {
@@ -395,8 +420,10 @@ Sample Results:
         }
     }
 ])
+```
 Description: This query calculates the average review scores rating for each neighborhood where the rating is 4 or above. It first filters listings with a review score of 4 or higher, groups them by neighborhood, calculates the average rating for each neighborhood, filters those with an average rating of 4 or higher, and finally sorts them in descending order of the average rating. The results show only the neighborhood and the computed average rating.
 Sample Results:
+```
 { "averageRating" : 4.92, "neighbourhood" : "Allach-Untermenzing" }
 { "averageRating" : 4.867088235294117, "neighbourhood" : "Au-Haidhausen" }
 { "averageRating" : 4.859213114754098, "neighbourhood" : "Neuhausen-Nymphenburg" }
@@ -407,5 +434,6 @@ Sample Results:
 { "averageRating" : 4.829354838709677, "neighbourhood" : "Tudering-Riem" }
 { "averageRating" : 4.823296703296704, "neighbourhood" : "Altstadt-Lehel" }
 { "averageRating" : 4.823203883495145, "neighbourhood" : "Schwabing-West" }
+```
 
 The results from this query provide a comprehensive overview of customer satisfaction across different neighborhoods in Munich, specifically highlighting those with an average review score of 4 or above. This query is especially useful for identifying which neighborhoods host the most well-received listings, which can be indicative of both desirable living areas and effective hosting. Neighborhoods like Allach-Untermenzing and Neuhausen-Nymphenburg score particularly high, suggesting that these more residential areas might offer qualities that are highly valued by guests, such as quiet, space, and perhaps more personalized hospitality. Airbnb itself or local tourism boards might use this data to promote certain neighborhoods as ideal places to stay, based on guest satisfaction. 
